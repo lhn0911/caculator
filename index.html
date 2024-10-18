@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casio Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background-color: #444;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        .brand {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .casio {
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .classwiz {
+            color: #ff4136;
+            font-size: 0.8em;
+        }
+        .screen {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Nội dung bắt đầu từ phía trên */
+            height: 80px;
+            text-align: left; /* Căn trái nội dung */
+        }
+        .expression-display {
+            font-size: 1.2em;
+            color: #444;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 50%; /* Chiếm 50% chiều cao màn hình */
+            display: flex;
+            align-items: flex-end; /* Căn biểu thức xuống cuối dòng phía trên */
+        }
+        .result-display {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #000;
+            height: 50%; /* Chiếm 50% chiều cao màn hình */
+            display: flex;
+            align-items: flex-start; /* Căn kết quả lên đầu phần dưới */
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+        button {
+            padding: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .func-btn {
+            background-color: #333;
+            color: white;
+        }
+        .num-btn {
+            background-color: #666;
+            color: white;
+        }
+        .num-btn:hover {
+            background-color: #777;
+        }
+        .op-btn {
+            background-color: #555;
+            color: white;
+        }
+        .op-btn:hover {
+            background-color: #666;
+        }
+        .equal-btn {
+            background-color: #ff8c00;
+            color: white;
+            grid-column: span 2;
+        }
+        .equal-btn:hover {
+            background-color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="brand">
+            <span class="casio">CASIO</span>
+            <span class="classwiz">ClassWiz</span>
+        </div>
+        <div class="screen">
+            <div class="expression-display" id="expressionDisplay"></div>
+            <div class="result-display" id="resultDisplay">0</div>
+        </div>
+        <div class="buttons">
+            <button class="func-btn" onclick="clearAll()">AC</button>
+            <button class="func-btn" onclick="clearEntry()">CE</button>
+            <button class="func-btn" onclick="deleteLastChar()">DEL</button>
+            <button class="func-btn" onclick="memoryStore()">MS</button>
+            <button class="func-btn" onclick="memoryRecall()">MR</button>
+            
+            <button class="func-btn" onclick="appendOperator('x²')">x²</button>
+            <button class="func-btn" onclick="appendOperator('√')">√</button>
+            <button class="op-btn" onclick="appendOperator('^')">^</button>
+            <button class="op-btn" onclick="appendOperator('(')">(</button>
+            <button class="op-btn" onclick="appendOperator(')')">)</button>
+            
+            <button class="op-btn" onclick="appendOperator('%')">%</button>
+            <button class="op-btn" onclick="appendOperator('÷')">÷</button>
+            <button class="op-btn" onclick="appendOperator('×')">×</button>
+            <button class="op-btn" onclick="appendOperator('+')">+</button>
+            <button class="op-btn" onclick="appendOperator('-')">-</button>
+            
+            <button class="num-btn" onclick="appendNumber('7')">7</button>
+            <button class="num-btn" onclick="appendNumber('8')">8</button>
+            <button class="num-btn" onclick="appendNumber('9')">9</button>
+            <button class="func-btn" onclick="toggleSign()">±</button>
+            <button class="func-btn" onclick="percent()">%</button>
+            
+            <button class="num-btn" onclick="appendNumber('4')">4</button>
+            <button class="num-btn" onclick="appendNumber('5')">5</button>
+            <button class="num-btn" onclick="appendNumber('6')">6</button>
+            <button class="func-btn" onclick="reciprocal()">1/x</button>
+            <button class="func-btn" onclick="appendOperator('Ans')">Ans</button>
+            
+            <button class="num-btn" onclick="appendNumber('1')">1</button>
+            <button class="num-btn" onclick="appendNumber('2')">2</button>
+            <button class="num-btn" onclick="appendNumber('3')">3</button>
+            <button class="num-btn" onclick="appendNumber('0')">0</button>
+            <button class="num-btn" onclick="appendNumber('.')">.</button>
+            
+            <button class="equal-btn" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const expressionDisplay = document.getElementById('expressionDisplay');
+        const resultDisplay = document.getElementById('resultDisplay');
+        let currentExpression = '';
+        let currentResult = '0';
+        let lastResult = '0';
+        let memory = '0';
+        let isNewCalculation = true;
+
+        function updateDisplay() {
+            expressionDisplay.textContent = currentExpression;
+            resultDisplay.textContent = currentResult;
+        }
+
+        function appendNumber(num) {
+            if (isNewCalculation) {
+                currentExpression = '';
+                currentResult = '0';
+                isNewCalculation = false;
+            }
+            if (currentResult === '0' && num !== '.') {
+                currentResult = num;
+            } else {
+                currentResult += num;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            isNewCalculation = false;
+            if (currentResult !== '0' || currentExpression !== '') {
+                if (currentExpression === '') {
+                    currentExpression = currentResult;
+                }
+                currentExpression += ' ' + op + ' ';
+                currentResult = '0';
+                updateDisplay();
+            }
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            currentResult = '0';
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentResult = '0';
+            updateDisplay();
+        }
+
+        function deleteLastChar() {
+            if (currentResult.length > 1) {
+                currentResult = currentResult.slice(0, -1);
+            } else {
+                currentResult = '0';
+            }
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentResult !== '0') {
+                if (currentResult.startsWith('-')) {
+                    currentResult = currentResult.slice(1);
+                } else {
+                    currentResult = '-' + currentResult;
+                }
+                updateDisplay();
+            }
+        }
+
+        function memoryStore() {
+            memory = currentResult;
+        }
+
+        function memoryRecall() {
+            currentResult = memory;
+            updateDisplay();
+        }
+
+        function percent() {
+            try {
+                let value = parseFloat(currentResult);
+                currentResult = (value / 100).toString();
+                updateDisplay();
+            } catch (error) {
+                currentResult = 'Error';
+            }
+        }
+
+        function reciprocal() {
+            try {
+                let value = parseFloat(currentResult);
+                currentResult = (1 / value).toString();
+                updateDisplay();
+            } catch (error) {
+                currentResult = 'Error';
+            }
+        }
+
+        function calculate() {
+            try {
+                currentExpression += currentResult;
+                currentResult = eval(currentExpression.replace('×', '*').replace('÷', '/')).toString();
+                lastResult = currentResult;
+                isNewCalculation = true;
+                updateDisplay();
+            } catch (error) {
+                currentResult = 'Error';
+                updateDisplay();
+            }
+        }
+    </script>
+</body>
+</html>

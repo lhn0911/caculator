@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng viết văn</title>
+</head>
+<body>
+    <h1>Viết văn</h1>
+    <label for="prompt">Nhập đề bài:</label>
+    <input type="text" id="prompt" placeholder="Nhập đề bài của bạn...">
+    <button onclick="handle()">Viết</button>
+
+    <h2>Kết quả:</h2>
+    <div id="result"></div>
+
+    <script>
+        // Mảng chứa các bài văn mẫu
+        const essays = [
+            { prompt: "Mùa thu", content: "Mùa thu là mùa đẹp nhất trong năm, khi lá vàng rơi và không khí mát mẻ." },
+            { prompt: "Gia đình", content: "Gia đình là nơi yêu thương và là chỗ dựa tinh thần vững chắc cho mỗi người." },
+            { prompt: "Tình bạn", content: "Tình bạn là một món quà quý giá, giúp chúng ta vượt qua những khó khăn trong cuộc sống." },
+            // Thêm nhiều bài văn khác nếu cần
+        ];
+
+        // Hàm xử lý khi người dùng nhấn "Viết"
+        function handle() {
+            const userPrompt = document.getElementById('prompt').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            // Tìm bài văn phù hợp với đề bài
+            const matchedEssay = essays.find(essay => essay.prompt === userPrompt);
+
+            if (matchedEssay) {
+                resultDiv.textContent = matchedEssay.content;
+            } else {
+                resultDiv.textContent = "Không tìm thấy bài văn phù hợp với đề bài này.";
+            }
+        }
+    </script>
+</body>
+</html>
